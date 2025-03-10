@@ -1,5 +1,8 @@
 package com.qtlimited.urls.service;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,13 +88,46 @@ public class URLsService implements URLsServiceInterface {
     @Override
     @Transactional
     public BodyResponse getUrls() throws Exception {
-        throw new Exception();
+        try {
+            User user = getAuthenticatedUser();
+
+            BodyResponse response = new BodyResponse();
+            response.setProcessed(true);
+            response.setResult(urLsRepository.findByUser(user));
+            response.setStatusCode(HttpStatus.OK);
+
+            return response;
+        } catch (Exception e) {
+            throw new Exception("Exception Occurred: " + e.getMessage());
+        }
     }
 
     @Override
     @Transactional
     public BodyResponse getUrlsAnalytics(String url) throws Exception {
-        throw new Exception();
+        try {
+            User user = getAuthenticatedUser();
+
+            Optional<URLs> specificURL = urLsRepository.findByShortCodeAndUser(url, user);
+
+            if (specificURL.isEmpty()) {
+                throw new Exception("URL is not present");
+            }
+
+            Long clicks = specificURL.get().getClicks();
+
+            Map<String, Long> response = new HashMap<>();
+            response.put("clicks", clicks);
+
+            BodyResponse bodyResponse = new BodyResponse();
+            bodyResponse.setProcessed(true);
+            bodyResponse.setResult(response);
+            bodyResponse.setStatusCode(HttpStatus.OK);
+
+            return bodyResponse;
+        } catch (Exception e) {
+            throw new Exception("Exception Occurred: " + e.getMessage());
+        }
     }
 
 }

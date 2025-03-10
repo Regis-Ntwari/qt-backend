@@ -47,7 +47,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                     throw new NoTokenProvidedException("No Bearer Token Provided");
                 }
 
-                System.out.println("Hello");
                 final String jwt = authHeader.substring(7);
 
                 final String username = jwtService.extractUsername(jwt);
@@ -56,7 +55,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                     UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
                     if (jwtService.isTokenValid(jwt, userDetails)) {
-                        System.out.println("Hello me");
                         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities());
 
